@@ -1,11 +1,10 @@
 from command_codes import *
 from connection_manager import LaserConnection
 
+
 class RawCommand:
     def __init__(self, manager: LaserConnection):
-        self.manager=manager
-
-
+        self.manager = manager
 
     def cmd_raw_disable_laser(self):
         return self.manager.send_command(DISABLE_LASER)
@@ -54,7 +53,9 @@ class RawCommand:
         :param nonfirst: either 0x0000 for first entry or 0x0100 for non-first.
         :return:
         """
-        self.manager.send_command(WRITE_CORRECTION_LINE, dx, dy, nonfirst, read_reply=False)
+        self.manager.send_command(
+            WRITE_CORRECTION_LINE, dx, dy, nonfirst, read_reply=False
+        )
 
     def cmd_raw_reset_list(self):
         return self.manager.send_command(RESET_LIST)
@@ -73,18 +74,18 @@ class RawCommand:
         """
         return self.manager.send_command(WRITE_CORRECTION_TABLE, int(has_table))
 
-    def cmd_raw_set_control_mode(self, s1: int, value: int): #################
+    def cmd_raw_set_control_mode(self, s1: int, value: int):  #################
         return self.manager.send_command(SET_CONTROL_MODE, int(s1), int(value))
 
-    def cmd_raw_set_delay_mode(self, s1: int, value: int): #################
+    def cmd_raw_set_delay_mode(self, s1: int, value: int):  #################
         return self.manager.send_command(SET_DELAY_MODE, int(s1), int(value))
 
-    def cmd_raw_set_max_poly_delay(self, s1: int, value: int): #################
+    def cmd_raw_set_max_poly_delay(self, s1: int, value: int):  #################
         return self.manager.send_command(SET_MAX_POLY_DELAY, int(s1), int(value))
 
     def cmd_raw_set_end_of_list(self, a=0, b=0):
         """
-        No parameters 
+        No parameters
         :return: value response
         """
         # It does so have parameters, in the pcap...
