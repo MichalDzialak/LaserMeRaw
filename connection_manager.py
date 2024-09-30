@@ -2,6 +2,7 @@ import usb.core
 import usb.util
 import time
 import threading
+import math
 
 from command_codes import *
 
@@ -31,8 +32,8 @@ class LaserConnection:
             raise Exception("Invalid machine index %d" % machine_index)
 
         device.set_configuration()
+        # device.reset()
         self._device = device
-
         time.sleep(
             0.05
         )  # We sacrifice this time at the altar of the unknown race condition

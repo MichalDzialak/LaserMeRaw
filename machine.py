@@ -10,6 +10,8 @@ class Machine:
         self.manager = manager
         self._footswitch_callback = None
         self._footswitch_fire_once = False
+        self._lock = threading.Lock()
+        self.sleep_time = 0.001
 
     def setup(self, settings: LaserSettings, field_size_x: float, field_size_y: float):
         self.field_size_x = field_size_x
@@ -92,14 +94,14 @@ class Machine:
 
     def is_ready(self):
         """Returns true if the laser is ready for more data, false otherwise."""
-        self.read_port()
-        return bool(self.manager.usb_connection.status & 0x20)
+        self.commander.cmd_raw_read_port()
+        return bool(self.manager.status & 0x20)
 
     def is_busy(self):
         """Returns true if the machine is busy, false otherwise;
         Note that running a lighting job counts as being busy."""
-        self.read_port()
-        return bool(self.manager.usb_connection.status & 0x04)
+        self.commander.cmd_raw_read_port()
+        return bool(self.manager.status & 0x04)
 
     def execute_job(self, job_list, loop_count=1, callback_finished=None):
         """Run a job. loop_count is the number of times to repeat the
@@ -119,20 +121,20 @@ class Machine:
                 if self._terminate_execution:
                     return False
 
-            self.port_on(bit=0)
+            # self.commander. port_on(bit=0)
 
             loop_index = 0
             while loop_index < loop_count:
-                if job_list.tick is not None:
-                    job_list.tick(job_list, loop_index)
-                self.raw_reset_list()
+                #                if job_list.tick is not None:
+                #                    job_list.tick(job_list, loop_index)
+                self.commander.cmd_raw_reset_list()
 
                 for packet in job_list.packet_generator():
                     while not self.is_ready():
                         if self._terminate_execution:
                             return False
                         time.sleep(self.sleep_time)
-                    self.manager.usb_connection.send_list_chunk(packet)
+                    self.manager.send_list_chunk(packet)
                     self.commander.cmd_raw_set_end_of_list(0x8001, 0x8001)
                     self.commander.cmd_raw_execute_list()
 
