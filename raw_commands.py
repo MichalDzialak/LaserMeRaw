@@ -186,14 +186,13 @@ class RawCommand:
         """
         return self.manager.send_command(GO_TO_AXIS_ORIGIN, v0)
 
-    def cmd_raw_move_axis_to(self, axis, coord):
+    def cmd_raw_move_axis_to(self, coord_lower, coord_upper):
         """
         This typically accepted 1 32 bit int and used bits 1:8 and then 16:24 as parameters.
-        :param axis: axis being moved
         :param coord: coordinate being matched
         :return: value response
         """
-        return self.manager.send_command(MOVE_AXIS_TO, axis, coord)
+        return self.manager.send_command(MOVE_AXIS_TO, coord_lower, coord_upper)
 
     def cmd_raw_get_axis_pos(self, s1: int, value: int):
         """

@@ -1,6 +1,7 @@
 from raw_commands import RawCommand
 from connection_manager import LaserConnection
 from machine import Machine
+import struct
 
 
 class LaserCommand:
@@ -94,3 +95,16 @@ class LaserCommand:
 
     def set_end_of_job(self, unk_a, unk_b):
         self.commander.cmd_raw_restart_list()
+
+    def set_axis_settings_and_origin(self, min_speed, max_speed, acceleration_ms):
+        self.commander.cmd_raw_set_axis_motion_param(min_speed, max_speed, 0)
+        self.commander.cmd_raw_set_axis_origin_param(acceleration_ms, 0, 0)
+
+    def move_axis_absolute(self, position):
+        packed = struct.pack("i", abs(position))
+        if position < 0:
+            packed = packed[:3] + bytes([packed[3] | 0x80])
+        lower = struct.unpack("H", packed[:2])[0]
+        upper = struct.unpack("H", packed[2:])[0]
+
+        self.commander.cmd_raw_move_axis_to(lower, upper)
